@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "basicFunctions.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node dist/basicFunctions.js\"",
+    "dev": "tsc-watch --onSuccess \"node dist/Comandos.js\"",
     "doc": "typedoc",
     "test": "vitest run",
     "coverage": "vitest run --coverage --coverage.include '**/src/*'"
@@ -15,6 +15,8 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@types/node": "^22.13.13",
+    "@types/yargs": "^17.0.33",
     "@vitest/coverage-v8": "^3.0.9",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
@@ -25,5 +27,9 @@
     "typedoc": "^0.28.1",
     "typescript-eslint": "^8.28.0",
     "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "yargs": "^17.7.2"
   }
 }
