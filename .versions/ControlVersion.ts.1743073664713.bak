@@ -1,0 +1,91 @@
+import fs from "fs";
+import path from "path";
+
+/**
+ * @brief Crea una copia de seguridad de un archivo en un directorio especificado.
+ * 
+ * @param filePath Ruta del archivo que se desea respaldar.
+ * @param backupDir Directorio donde se almacenará la copia de seguridad.
+ * 
+ */
+function commit(filePath: string, backupDir: string) {
+  const fileName = path.basename(filePath);
+  const timestamp = Date.now();
+  const backupFileName = `${fileName}.${timestamp}.bak`;
+  const backupFilePath = path.join(backupDir, backupFileName);
+
+  fs.access(filePath, fs.constants.R_OK, (accessErr) => {
+    if (accessErr) return console.error(`Fichero no accesible: ${accessErr.message}`);
+
+    fs.readFile(filePath, (readErr, data) => {
+      if (readErr) return console.error(`No se puede leer el fichero: ${readErr.message}`);
+
+      fs.writeFile(backupFilePath, data, (writeErr) => {
+        if (writeErr) return console.error(`Error a la hora de hacer el backup: ${writeErr.message}`);
+        console.log(`Backup created: ${backupFileName}`);
+      });
+    });
+  });
+}
+
+/**
+ * @brief Es la funcion encargada de ver si existe algun cabio y llama al commit
+ * 
+ * @param targetDir Diretorio al cual queremos observar
+ * @param backupDir Directorio donde se almacenará la copia de seguridad.
+ * 
+ */
+function watchMonitor(targetDir: string, backupDir: string) {
+  fs.access(targetDir, fs.constants.F_OK, (err) => {
+    if (err) {
+      return console.error(`No existe fichero de escucha`);
+    }
+  });
+
+  fs.access(backupDir, fs.constants.F_OK, (err) => {
+    if (err) {
+      fs.mkdir(backupDir, { recursive: true }, (err) => {
+        if (err) throw err;
+      });
+    }
+  });
+
+  fs.watch(targetDir, { recursive: true }, (eventType, fileName) => {
+    if (fileName && eventType === 'change') {
+      const filePath = path.join(targetDir, fileName);
+      console.log(`Change detected: ${fileName}`);
+      commit(filePath, backupDir);
+    }
+  });
+
+  console.log(`Watching for changes in: ${targetDir}`);
+}
+
+/**
+ * @brief Funcion encargada de mostrar todos las versiones de un ficherp
+ * 
+ * @param fileName Fichero el cual se va a checkear sus versiones
+ * @param backupDir Directorio donde se almacenará la copia de seguridad.
+ * 
+ */
+function log(fileName: string, backupDir: string) {
+  fs.readdir(backupDir, (err, files) => {
+    if (err) return console.error(`Error reading backup directory: ${err.message}`);
+    const versions = files.filter(file => file.startsWith(fileName));
+    if (versions.length === 0) {
+        console.log(`No backups found for ${fileName}`);
+    } else {
+        console.log(`Versions for ${fileName}:`);
+        versions.forEach(version => console.log(version));
+    }
+  });
+}
+
+
+const targetDir = process.argv[2] || './src';
+const backupDir = process.argv[3] || './.versions';
+const logFile = process.argv[4] || './src/ejercicio-02/ControlVersion.ts';
+
+log(logFile, backupDir);
+watchMonitor(targetDir, backupDir);
+

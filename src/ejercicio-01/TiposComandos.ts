@@ -17,13 +17,13 @@ export interface ArgsUsuarioId extends ArgsUsuario {
 }
 
 /**
- * Argumentos para comandos de agregar o actualizar un Funko.
+ * Argumento para comandos de agregar o actualizar un Funko.
  */
 export interface ArgsFunko extends ArgsUsuarioId {
   nombre: string;
   descripcion: string;
   tipo: string; // Luego se convertirá a TipoFunko
-  genero: string; // Luego se convertirá a GeneroFunko
+  genero: string; // Luego se convertirá a GeneroFunk
   franquicia: string;
   numero: number;
   exclusivo: boolean;
